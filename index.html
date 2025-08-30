@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Panel - Munafa Markaz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="authContainer">
+        <div class="auth-box">
+            <div class="header">
+                <i class="fas fa-shopping-cart"></i>
+                <h1>Munafa Markaz</h1>
+                <p class="subtitle">Professional Reselling Platform</p>
+            </div>
+            <!-- Login Form -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <input type="email" id="loginEmail" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                </div>
+                <button type="submit">Login</button>
+                <p id="loginError" class="error-message"></p>
+                <div class="toggle-form">
+                    <p>Don't have an account? <a onclick="toggleForms()">Sign up</a></p>
+                </div>
+            </form>
+            <!-- Sign Up Form -->
+            <form id="signupForm" style="display:none;">
+                <div class="form-group">
+                    <input type="text" id="signupName" placeholder="Full Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="signupEmail" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="signupPassword" placeholder="Password" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+                </div>
+                <button type="submit">Sign Up</button>
+                <p id="signupError" class="error-message"></p>
+                <p id="signupSuccess" class="success-message"></p>
+                <div class="toggle-form">
+                    <p>Already have an account? <a onclick="toggleForms()">Login</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Beautiful Animated Preloader -->
+    <div id="loaderOverlay" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:linear-gradient(135deg, #040F0F 0%, #2D3A3A 100%);z-index:2000;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+        <!-- Animated Logo -->
+        <div class="preloader-logo" style="margin-bottom:2rem;">
+            <i class="fas fa-shopping-cart" style="font-size:4rem;color:#248232;animation:pulse 2s ease-in-out infinite;"></i>
+        </div>
+        
+        <!-- Loading Text -->
+        <div class="preloader-text" style="color:#FCFFFC;font-size:1.5rem;font-weight:600;margin-bottom:2rem;text-align:center;">
+            <span style="animation:typing 2s steps(20) infinite;">Loading Munafa Markaz</span>
+        </div>
+        
+        <!-- Animated Progress Bar -->
+        <div class="preloader-progress" style="width:300px;height:6px;background:rgba(252,255,252,0.2);border-radius:10px;overflow:hidden;position:relative;">
+            <div class="progress-fill" style="height:100%;background:linear-gradient(90deg, #248232, #2BA84A);border-radius:10px;animation:progress 2s ease-in-out infinite;width:0%;"></div>
+        </div>
+        
+        <!-- Loading Dots -->
+        <div class="loading-dots" style="margin-top:1.5rem;display:flex;gap:0.5rem;">
+            <div class="dot" style="width:12px;height:12px;background:#248232;border-radius:50%;animation:bounce 1.4s ease-in-out infinite both;"></div>
+            <div class="dot" style="width:12px;height:12px;background:#2BA84A;border-radius:50%;animation:bounce 1.4s ease-in-out infinite both;animation-delay:0.2s;"></div>
+            <div class="dot" style="width:12px;height:12px;background:#248232;border-radius:50%;animation:bounce 1.4s ease-in-out infinite both;animation-delay:0.4s;"></div>
+        </div>
+        
+        <!-- Status Text -->
+        <div class="preloader-status" style="color:#6B7A6B;font-size:0.9rem;margin-top:1rem;text-align:center;">
+            <span id="loadingStatus">Initializing...</span>
+        </div>
+    </div>
+
+    <!-- Wrap nav in a container -->
+    <div id="mainNav">
+    <nav>
+        <div class="logo">
+            <i class="fas fa-shopping-cart"></i>
+            <span>Munafa Markaz</span>
+        </div>
+        <div class="nav-items">
+            <a href="#" class="active">Home</a>
+            <a href="#" id="withdrawBtn">Withdraw</a>
+            <a href="#" id="notificationsBtn">Notifications <span id="notificationBadge" style="display:none;background:#cc1818;color:#fff;border-radius:10px;padding:2px 8px;font-size:0.8em;vertical-align:top;margin-left:4px;"></span></a>
+            <a href="#" id="profileBtn">Profile</a>
+            <a href="#" id="logoutBtn">Logout</a>
+            <span class="user-info" id="workerName">Loading...</span>
+        </div>
+    </nav>
+    </div>
+
+    <div class="container">
+        <div class="stats-container">
+            <div class="stat-card">
+                <i class="fas fa-shopping-bag"></i>
+                <div class="stat-info">
+                    <h3>Total Orders</h3>
+                    <p id="totalOrders">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-clock"></i>
+                <div class="stat-info">
+                    <h3>Pending Orders</h3>
+                    <p id="pendingOrders">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-check-circle"></i>
+                <div class="stat-info">
+                    <h3>Completed Orders</h3>
+                    <p id="completedOrders">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-times-circle"></i>
+                <div class="stat-info">
+                    <h3>Cancelled Orders</h3>
+                    <p id="cancelledOrders">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-dollar-sign"></i>
+                <div class="stat-info">
+                    <h3>Available Profit</h3>
+                    <p id="totalProfit">PKR 0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="orders-section">
+            <div class="orders-header" style="display:flex;align-items:center;gap:16px;">
+                <h2 style="margin-right:auto;">Orders</h2>
+                <button id="activeOrdersTab" class="btn-secondary" style="font-weight:600;">Active Orders</button>
+                <button id="orderHistoryTab" class="btn-secondary">Order History</button>
+                <button id="newOrderBtn" class="btn-primary" style="margin-left:16px;">
+                    <i class="fas fa-plus"></i> New Order
+                </button>
+            </div>
+            <div class="orders-table" id="activeOrdersTableSection">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer Name</th>
+                            <th>Product Code</th>
+                            <th>Address</th>
+                            <th>Phone</th>
+                            <th>Profit</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <!-- Active Orders will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="orders-table" id="orderHistoryTableSection" style="display:none;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer Name</th>
+                            <th>Product Code</th>
+                            <th>Address</th>
+                            <th>Phone</th>
+                            <th>Profit</th>
+                            <th>Status</th>
+                            <th>Completed/Cancelled At</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderHistoryTableBody">
+                        <!-- Order History will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Section -->
+    <div id="notificationsSection" class="section" style="display: none;">
+        <div class="container">
+            <div class="section-header">
+                <h2>Notifications</h2>
+            </div>
+            <div class="notifications-list" id="notificationsList">
+                <!-- Notification cards will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- New Order Modal -->
+    <div id="newOrderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>New Order</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="newOrderForm">
+                    <div class="form-group">
+                        <label for="customerName">Customer Name</label>
+                        <input type="text" id="customerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <input type="text" id="address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productCode">Product Code</label>
+                        <input type="text" id="productCode" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="profit">Your Profit</label>
+                        <input type="number" id="profit" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Place Order</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div id="withdrawModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Withdraw Earnings</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="current-earnings">
+                    <h3>Available Balance</h3>
+                    <p id="availableBalance">PKR 0</p>
+                </div>
+                <form id="withdrawForm">
+                    <div class="form-group">
+                        <label for="withdrawAmount">Amount (Min: PKR 200, Max: PKR 50,000)</label>
+                        <input type="number" id="withdrawAmount" min="200" max="50000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentMethod">Payment Method</label>
+                        <select id="paymentMethod" required>
+                            <option value="">Select Payment Method</option>
+                            <option value="jazzcash">JazzCash</option>
+                            <option value="easypaisa">EasyPaisa</option>
+                            <option value="bank">Bank Account</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="accountHolder">Account Holder Name</label>
+                        <input type="text" id="accountHolder" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="accountNumber">Account Number</label>
+                        <input type="text" id="accountNumber" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Submit Withdrawal Request</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Profile</h2>
+                <span class="close" id="closeProfileModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="profileForm">
+                <div class="form-group">
+                        <label for="profileName">Full Name</label>
+                        <input type="text" id="profileName" required>
+                </div>
+                <div class="form-group">
+                        <label for="profileEmail">Email</label>
+                        <input type="email" id="profileEmail" required disabled>
+                </div>
+                    <div class="form-group">
+                        <label>Last Login</label>
+                        <input type="text" id="profileLastLogin" disabled>
+                </div>
+                <div class="form-group">
+                        <label>Account Created</label>
+                        <input type="text" id="profileCreatedAt" disabled>
+                </div>
+                    <button type="submit" class="btn-primary">Update Profile</button>
+                    <p id="profileSuccess" class="success-message" style="display:none;"></p>
+                    <p id="profileError" class="error-message" style="display:none;"></p>
+                </form>
+                <hr style="margin: 24px 0;">
+                <form id="changePasswordForm">
+                    <h3 style="margin-bottom: 12px;">Change Password</h3>
+                <div class="form-group">
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" required>
+                </div>
+                <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" required>
+                </div>
+                <div class="form-group">
+                        <label for="confirmNewPassword">Confirm New Password</label>
+                        <input type="password" id="confirmNewPassword" required>
+                </div>
+                    <button type="submit" class="btn-primary">Change Password</button>
+                    <p id="passwordSuccess" class="success-message" style="display:none;"></p>
+                    <p id="passwordError" class="error-message" style="display:none;"></p>
+            </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add this style in <head> (after existing links) -->
+    <style>
+        /* Notifications Section Styles */
+        .section-header {
+            margin-bottom: 20px;
+        }
+        
+        .section-header h2 {
+            color: #333;
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        .notifications-table {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .notifications-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .notifications-table th,
+        .notifications-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .notifications-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .notifications-table tr:hover {
+            background: #f8f9fa;
+            cursor: pointer;
+        }
+        
+        .status-badge.status-read {
+            background: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .status-badge.status-unread {
+            background: #dc3545;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: auto;
+            background: rgba(0,0,0,0.4);
+            transition: opacity 0.3s;
+        }
+        .modal-content {
+            background: #fff;
+            margin: 40px auto;
+            border-radius: 12px;
+            padding: 0;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+            animation: modalIn 0.3s;
+        }
+        @keyframes modalIn {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px 10px 24px;
+            border-bottom: 1px solid #eee;
+        }
+        .modal-header h2 {
+            font-size: 20px;
+            color: #333;
+            margin: 0;
+        }
+        .modal-header .close {
+            font-size: 24px;
+            color: #888;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .modal-header .close:hover {
+            color: #dc3545;
+        }
+        .modal-body {
+            padding: 24px;
+        }
+        .modal-body form .form-group {
+            margin-bottom: 18px;
+        }
+        .modal-body label {
+            display: block;
+            margin-bottom: 6px;
+            color: #444;
+            font-weight: 500;
+        }
+        .modal-body input,
+        .modal-body select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+            box-sizing: border-box;
+            margin-bottom: 2px;
+        }
+        .modal-body button.btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        .modal-body button.btn-primary:hover {
+            background: #0056b3;
+        }
+        .current-earnings {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+        .current-earnings h3 {
+            margin: 0 0 6px 0;
+            font-size: 16px;
+            color: #333;
+        }
+        .current-earnings p {
+            margin: 0;
+            font-size: 18px;
+            color: #007bff;
+            font-weight: 600;
+        }
+        @media (max-width: 500px) {
+            .modal-content {
+                max-width: 98vw;
+                padding: 0;
+            }
+            .modal-body {
+                padding: 14px;
+            }
+            .modal-header {
+                padding: 14px 14px 6px 14px;
+            }
+        }
+        .notifications-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .notification-card {
+            background: #fff;
+            border-radius: 6px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            padding: 10px 16px 8px 16px;
+            cursor: pointer;
+            transition: box-shadow 0.18s, background 0.18s, border 0.18s;
+            border-left: 4px solid #2271b1;
+            border: 1px solid #e3e6ea;
+            position: relative;
+            min-height: 48px;
+        }
+        .notification-card.unread {
+            background: #f7fbff;
+            border-left-color: #cc1818;
+            border-color: #e3e6ea;
+        }
+        .notification-card:hover {
+            box-shadow: 0 2px 8px rgba(34,113,177,0.08);
+            background: #f0f6fa;
+            border-color: #b3c6db;
+        }
+        .notification-card .notif-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1d2327;
+            margin-bottom: 0px;
+            line-height: 1.2;
+        }
+        .notification-card .notif-date {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 2px;
+            margin-top: 2px;
+        }
+        .notification-card .notif-preview {
+            font-size: 0.97rem;
+            color: #444;
+            margin-bottom: 2px;
+            white-space: pre-line;
+            line-height: 1.4;
+        }
+        .notification-card .notif-badge {
+            position: absolute;
+            top: 10px;
+            right: 16px;
+            background: #dc3545;
+            color: #fff;
+            font-size: 0.78rem;
+            padding: 2px 9px;
+            border-radius: 50px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        .notification-card.read .notif-badge {
+            background: #28a745;
+        }
+        .notification-card .notif-full-message {
+            margin-top: 7px;
+            font-size: 0.97rem;
+            color: #222;
+            background: #f8f9fa;
+            border-radius: 5px;
+            padding: 10px 12px;
+            animation: fadeInNotif 0.18s;
+            border: 1px solid #e3e6ea;
+        }
+        @keyframes fadeInNotif {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
+    <!-- Place Firebase SDKs and initialization at the top, before any event handlers -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC8p7M9mym1tfqqr32tQwBN8BEHV3QH6XU",
+            authDomain: "reselling-cd237.firebaseapp.com",
+            databaseURL: "https://reselling-cd237-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "reselling-cd237",
+            storageBucket: "reselling-cd237.firebasestorage.app",
+            messagingSenderId: "511305304581",
+            appId: "1:511305304581:web:38b2ecaca17ae9fad6ea6c",
+            measurementId: "G-CKTRY9H56K"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+        let currentWorkerId = null;
+        let currentWorkerName = null;
+        let orders = {};
+    </script>
+
+    <!-- Toggle between login and signup forms -->
+    <script>
+        function toggleForms() {
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            if (loginForm && signupForm) {
+            if (loginForm.style.display === 'none') {
+                loginForm.style.display = 'block';
+                signupForm.style.display = 'none';
+            } else {
+                loginForm.style.display = 'none';
+                signupForm.style.display = 'block';
+            }
+            }
+            const loginError = document.getElementById('loginError');
+            const signupError = document.getElementById('signupError');
+            const signupSuccess = document.getElementById('signupSuccess');
+            if (loginError) loginError.style.display = 'none';
+            if (signupError) signupError.style.display = 'none';
+            if (signupSuccess) signupSuccess.style.display = 'none';
+            showLoginSectionOnly();
+        }
+    </script>
+
+    <!-- Hide dashboard content initially -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mainContainer = document.querySelector('.container');
+            if (mainContainer) mainContainer.style.display = 'none';
+        });
+    </script>
+
+    <!-- Login -->
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorMessage = document.getElementById('loginError');
+                if (errorMessage) errorMessage.style.display = 'none';
+            console.log('[LOGIN] Attempting login for:', email);
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                console.log('[LOGIN] Auth success:', user.uid);
+                // Check if user is worker
+                const workerRef = database.ref('workers/' + user.uid);
+                const workerSnapshot = await workerRef.once('value');
+                console.log('[LOGIN] Worker snapshot:', workerSnapshot.exists(), workerSnapshot.val());
+                if (workerSnapshot.exists()) {
+                    currentWorkerId = user.uid;
+                    currentWorkerName = workerSnapshot.val().name;
+                    console.log('Set Current Worker:', { id: currentWorkerId, name: currentWorkerName });
+                    document.getElementById('workerName').textContent = currentWorkerName;
+                    document.getElementById('authContainer').style.display = 'none';
+                    document.querySelector('.container').style.display = 'block';
+                    // Force update data after login
+                    updateOrdersTable(orders);
+                    updateStats(orders);
+                } else {
+                    errorMessage.textContent = 'You are not authorized as a worker. (No worker entry found)';
+                    errorMessage.style.display = 'block';
+                    console.log('[LOGIN] No worker entry found for this user.');
+                    auth.signOut();
+                }
+            } catch (error) {
+                errorMessage.textContent = error.message;
+                errorMessage.style.display = 'block';
+                console.error('[LOGIN] Error:', error);
+            }
+        });
+        }
+    </script>
+
+    <!-- Signup -->
+    <script>
+        const signupForm = document.getElementById('signupForm');
+        if (signupForm) {
+            signupForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const errorMessage = document.getElementById('signupError');
+            const successMessage = document.getElementById('signupSuccess');
+                if (errorMessage) errorMessage.style.display = 'none';
+                if (successMessage) successMessage.style.display = 'none';
+            console.log('[SIGNUP] Attempting signup for:', email);
+            if (password !== confirmPassword) {
+                errorMessage.textContent = 'Passwords do not match.';
+                errorMessage.style.display = 'block';
+                console.log('[SIGNUP] Passwords do not match.');
+                return;
+            }
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                console.log('[SIGNUP] Auth success:', user.uid);
+                // Save worker info
+                await database.ref('workers/' + user.uid).set({ name, email });
+                console.log('[SIGNUP] Worker entry created:', { name, email });
+                    // Send default welcome notification
+                    await database.ref('notifications/' + user.uid).push({
+                        title: 'Welcome to Munafa Markaz!',
+                        message: `Munafa Markaz ek modern reselling platform hai jahan log bina investment ke asaani se products ko agay sell karke apna munafa kama saktay hain. Yeh platform un workers ke liye tayar kiya gaya hai jo ghar baithay ya part-time kaam karke earning karna chahte hain. Is website par unhein smart tools aur ready-to-sell content diya jata hai jo unki selling process ko fast aur easy banata hai. Har user apne liye alag dashboard aur order tracking system ka use karke apna business efficiently chala sakta hai — sab kuch simple, munafa bhara aur stress-free.`,
+                        timestamp: Date.now(),
+                        read: false
+                    });
+                successMessage.textContent = 'Account created! You can now login.';
+                successMessage.style.display = 'block';
+                setTimeout(() => toggleForms(), 1500);
+            } catch (error) {
+                errorMessage.textContent = error.message;
+                errorMessage.style.display = 'block';
+                console.error('[SIGNUP] Error:', error);
+            }
+        });
+        }
+    </script>
+
+    <!-- Auth state -->
+    <script>
+        function showLoginSectionOnly() {
+            const authContainer = document.getElementById('authContainer');
+            const mainContainer = document.querySelector('.container');
+            const notificationsSection = document.getElementById('notificationsSection');
+            const mainNav = document.getElementById('mainNav');
+            const modals = document.querySelectorAll('.modal');
+            if (authContainer) authContainer.style.display = 'block';
+            if (mainContainer) mainContainer.style.display = 'none';
+            if (mainNav) mainNav.style.display = 'none';
+            if (notificationsSection) notificationsSection.style.display = 'none';
+            modals.forEach(m => m.style.display = 'none');
+        }
+
+        // Loader overlay logic
+        const loaderOverlay = document.getElementById('loaderOverlay');
+        function hideLoader() { if (loaderOverlay) loaderOverlay.style.display = 'none'; }
+        function showLoader() { if (loaderOverlay) loaderOverlay.style.display = 'flex'; }
+        showLoader(); // Show loader by default
+        // Fallback: hide loader after 5 seconds in any case
+        setTimeout(hideLoader, 5000);
+
+        auth.onAuthStateChanged(async function(user) {
+            const authContainer = document.getElementById('authContainer');
+            const mainContainer = document.querySelector('.container');
+            const notificationsSection = document.getElementById('notificationsSection');
+            const mainNav = document.getElementById('mainNav');
+            try {
+            if (user) {
+                // Check if worker
+                const workerRef = database.ref('workers/' + user.uid);
+                const workerSnapshot = await workerRef.once('value');
+                console.log('[AUTH STATE] User:', user.uid, 'Worker exists:', workerSnapshot.exists());
+                if (workerSnapshot.exists()) {
+                    currentWorkerId = user.uid;
+                    currentWorkerName = workerSnapshot.val().name;
+                    console.log('Set Current Worker:', { id: currentWorkerId, name: currentWorkerName });
+                        const workerNameEl = document.getElementById('workerName');
+                        if (workerNameEl) workerNameEl.textContent = currentWorkerName;
+                        if (authContainer) authContainer.style.display = 'none';
+                        if (mainContainer) mainContainer.style.display = 'block';
+                        if (mainNav) mainNav.style.display = 'block';
+                        if (notificationsSection) notificationsSection.style.display = 'none';
+                        // Attach listeners only after authentication
+                        database.ref('orders').on('value', (snapshot) => {
+                            orders = snapshot.val() || {};
+                    updateOrdersTable(orders);
+                    updateStats(orders);
+                        });
+                        database.ref('withdrawalRequests').on('value', () => {
+                            updateStats(orders);
+                        });
+                        updateNotificationBadgeRealtime(); // Update badge on auth state change
+                } else {
+                        showLoginSectionOnly();
+                    auth.signOut();
+                    console.log('[AUTH STATE] No worker entry for user, signed out.');
+                }
+            } else {
+                    showLoginSectionOnly();
+                console.log('[AUTH STATE] No authenticated user.');
+                }
+            } catch (e) {
+                console.error('Error in auth state:', e);
+            } finally {
+                hideLoader(); // Always hide loader after auth state is resolved
+            }
+        });
+    </script>
+
+    <!-- Place logout handler after auth is defined -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    auth.signOut().then(() => {
+                        showLoginSectionOnly();
+                    });
+                });
+            }
+        });
+    </script>
+
+    <!-- Worker Panel Script -->
+    <script>
+        // DOM Elements
+        const modal = document.getElementById('newOrderModal');
+        const newOrderBtn = document.getElementById('newOrderBtn');
+        const closeBtn = document.querySelector('.close');
+        const orderForm = document.getElementById('newOrderForm');
+        const ordersTableBody = document.getElementById('ordersTableBody');
+
+        // Stats Elements
+        const totalOrdersEl = document.getElementById('totalOrders');
+        const pendingOrdersEl = document.getElementById('pendingOrders');
+        const completedOrdersEl = document.getElementById('completedOrders');
+        const cancelledOrdersEl = document.getElementById('cancelledOrders');
+        const totalProfitEl = document.getElementById('totalProfit');
+
+        // Withdraw Elements
+        const withdrawModal = document.getElementById('withdrawModal');
+        const withdrawBtn = document.getElementById('withdrawBtn');
+        const withdrawForm = document.getElementById('withdrawForm');
+        const availableBalance = document.getElementById('availableBalance');
+
+        // Notifications Elements
+        const notificationsBtn = document.getElementById('notificationsBtn');
+        const notificationsSection = document.getElementById('notificationsSection');
+        const notificationsList = document.getElementById('notificationsList');
+
+        // Profile Elements
+        const profileBtn = document.getElementById('profileBtn');
+        const profileModal = document.getElementById('profileModal');
+        const closeProfileModal = document.getElementById('closeProfileModal');
+        const profileForm = document.getElementById('profileForm');
+        const profileNameInput = document.getElementById('profileName');
+        const profileEmailInput = document.getElementById('profileEmail');
+        const profileSuccessMessage = document.getElementById('profileSuccess');
+        const profileErrorMessage = document.getElementById('profileError');
+
+        // Change Password Logic
+        const changePasswordForm = document.getElementById('changePasswordForm');
+        const currentPasswordInput = document.getElementById('currentPassword');
+        const newPasswordInput = document.getElementById('newPassword');
+        const confirmNewPasswordInput = document.getElementById('confirmNewPassword');
+        const passwordSuccess = document.getElementById('passwordSuccess');
+        const passwordError = document.getElementById('passwordError');
+        if (changePasswordForm) {
+            changePasswordForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!auth.currentUser) return;
+                passwordSuccess.style.display = 'none';
+                passwordError.style.display = 'none';
+                const currentPassword = currentPasswordInput.value;
+                const newPassword = newPasswordInput.value;
+                const confirmNewPassword = confirmNewPasswordInput.value;
+                if (!currentPassword || !newPassword || !confirmNewPassword) {
+                    passwordError.textContent = 'All fields are required.';
+                    passwordError.style.display = 'block';
+                    return;
+                }
+                if (newPassword !== confirmNewPassword) {
+                    passwordError.textContent = 'New passwords do not match.';
+                    passwordError.style.display = 'block';
+                    return;
+                }
+                // Re-authenticate user
+                const user = auth.currentUser;
+                const email = user.email;
+                const credential = firebase.auth.EmailAuthProvider.credential(email, currentPassword);
+                try {
+                    await user.reauthenticateWithCredential(credential);
+                    await user.updatePassword(newPassword);
+                    passwordSuccess.textContent = 'Password changed successfully!';
+                    passwordSuccess.style.display = 'block';
+                    passwordError.style.display = 'none';
+                    changePasswordForm.reset();
+                } catch (error) {
+                    passwordError.textContent = error.message;
+                    passwordError.style.display = 'block';
+                    passwordSuccess.style.display = 'none';
+                }
+            });
+        }
+
+        // Modal Controls
+        if (newOrderBtn && modal) {
+        newOrderBtn.addEventListener('click', () => {
+            modal.style.display = 'block';
+        });
+        }
+        if (withdrawBtn && withdrawModal && availableBalance) {
+        withdrawBtn.addEventListener('click', () => {
+            // Always fetch latest orders and withdrawals from Firebase
+            Promise.all([
+                database.ref('orders').once('value'),
+                database.ref('withdrawalRequests').once('value')
+            ]).then(([ordersSnapshot, withdrawalsSnapshot]) => {
+                const allOrders = ordersSnapshot.val() || {};
+                const withdrawals = withdrawalsSnapshot.val() || {};
+                // Calculate total profit from completed orders only
+                const totalProfit = Object.values(allOrders).reduce((total, order) => {
+                    if (order.workerId === currentWorkerId && order.status === 'completed') {
+                        total += order.profit;
+                    }
+                    return total;
+                }, 0);
+                // Calculate total completed withdrawals
+                const completedWithdrawals = Object.values(withdrawals)
+                    .filter(w => w.workerId === currentWorkerId && w.status === 'completed')
+                    .reduce((total, w) => total + w.amount, 0);
+                // Calculate actual available balance
+                const actualBalance = totalProfit - completedWithdrawals;
+                    availableBalance.textContent = `PKR ${actualBalance.toFixed(2)}`;
+                withdrawModal.style.display = 'block';
+            });
+            });
+        }
+
+        profileBtn.addEventListener('click', () => {
+            profileModal.style.display = 'block';
+            // Load current profile data
+            database.ref(`workers/${currentWorkerId}`).once('value')
+                .then(snapshot => {
+                    const worker = snapshot.val();
+                    if (worker) {
+                        profileNameInput.value = worker.name;
+                        profileEmailInput.value = worker.email;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading profile data:', error);
+                    showNotification('Error loading profile data', 'error');
+                });
+            // Load last login and created at from Firebase Auth
+            const user = auth.currentUser;
+            if (user) {
+                const lastLoginInput = document.getElementById('profileLastLogin');
+                const createdAtInput = document.getElementById('profileCreatedAt');
+                if (lastLoginInput) lastLoginInput.value = user.metadata.lastSignInTime ? new Date(user.metadata.lastSignInTime).toLocaleString() : '';
+                if (createdAtInput) createdAtInput.value = user.metadata.creationTime ? new Date(user.metadata.creationTime).toLocaleString() : '';
+            }
+        });
+
+        // Notifications button click handler
+        notificationsBtn.addEventListener('click', () => {
+            // Hide all sections
+            document.querySelector('.container').style.display = 'none';
+            notificationsSection.style.display = 'block';
+            
+            // Load notifications for current worker
+            loadNotifications();
+        });
+
+        // Load notifications for current worker (card style)
+        function loadNotifications() {
+            if (!currentWorkerId) return;
+            const notificationsList = document.getElementById('notificationsList');
+            notificationsList.innerHTML = '';
+            database.ref(`notifications/${currentWorkerId}`).orderByChild('timestamp').once('value')
+                .then((snapshot) => {
+                    const notifications = [];
+                    let unreadCount = 0;
+                    snapshot.forEach((notifSnapshot) => {
+                        const notification = notifSnapshot.val();
+                        if (!notification.read) unreadCount++;
+                        notifications.push({
+                            id: notifSnapshot.key,
+                            ...notification
+                        });
+                    });
+                    // Update badge
+                    const badge = document.getElementById('notificationBadge');
+                    if (badge) {
+                        if (unreadCount > 0) {
+                            badge.textContent = unreadCount;
+                            badge.style.display = 'inline-block';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                    // Sort by timestamp (newest first)
+                    notifications.sort((a, b) => b.timestamp - a.timestamp);
+                    let expandedCard = null;
+                    notifications.forEach((notif) => {
+                        const card = document.createElement('div');
+                        card.className = 'notification-card' + (notif.read ? ' read' : ' unread');
+                        const preview = notif.message.length > 80 ? notif.message.slice(0, 80) + '...' : notif.message;
+                        card.innerHTML = `
+                            <div class="notif-title">${notif.title}</div>
+                            <div class="notif-date">${formatDate(notif.timestamp)}</div>
+                            <div class="notif-preview">${preview}</div>
+                            <span class="notif-badge">${notif.read ? 'Read' : 'Unread'}</span>
+                        `;
+                        card.addEventListener('click', () => {
+                            // Collapse any expanded card
+                            if (expandedCard && expandedCard !== card) {
+                                const open = expandedCard.querySelector('.notif-full-message');
+                                if (open) open.remove();
+                                expandedCard.classList.remove('expanded');
+                            }
+                            // Toggle expand/collapse
+                            if (!card.classList.contains('expanded')) {
+                                card.classList.add('expanded');
+                                const fullMsg = document.createElement('div');
+                                fullMsg.className = 'notif-full-message';
+                                fullMsg.textContent = notif.message;
+                                card.appendChild(fullMsg);
+                                expandedCard = card;
+                            } else {
+                                const open = card.querySelector('.notif-full-message');
+                                if (open) open.remove();
+                                card.classList.remove('expanded');
+                                expandedCard = null;
+                            }
+                            // Mark as read if not already
+                            if (!notif.read) {
+                                database.ref(`notifications/${currentWorkerId}/${notif.id}`).update({ read: true });
+                                card.querySelector('.notif-badge').textContent = 'Read';
+                                card.classList.remove('unread');
+                                card.classList.add('read');
+                                // Update badge count
+                                if (badge) {
+                                    let count = parseInt(badge.textContent) || 0;
+                                    count = Math.max(0, count - 1);
+                                    if (count > 0) {
+                                        badge.textContent = count;
+                                        badge.style.display = 'inline-block';
+                                    } else {
+                                        badge.style.display = 'none';
+                                    }
+                                }
+                            }
+                        });
+                        notificationsList.appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading notifications:', error);
+                    showNotification('Error loading notifications', 'error');
+                });
+        }
+
+        // Helper function to format date
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Add click handler to go back to main dashboard
+        document.addEventListener('click', (e) => {
+            if (e.target.textContent === 'Home' || e.target.closest('a[href="#"]')) {
+                if (e.target.textContent === 'Home') {
+                    notificationsSection.style.display = 'none';
+                    document.querySelector('.container').style.display = 'block';
+                }
+            }
+        });
+
+        // Close buttons for all modals
+        document.querySelectorAll('.close').forEach(btn => {
+            btn.addEventListener('click', () => {
+                modal.style.display = 'none';
+                withdrawModal.style.display = 'none';
+                profileModal.style.display = 'none';
+            });
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+            if (event.target === withdrawModal) {
+                withdrawModal.style.display = 'none';
+            }
+            if (event.target === profileModal) {
+                profileModal.style.display = 'none';
+            }
+        });
+
+        // Handle New Order Submission
+        if (orderForm) {
+        orderForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const newOrder = {
+                customerName: document.getElementById('customerName').value,
+                address: document.getElementById('address').value,
+                phone: document.getElementById('phone').value,
+                productCode: document.getElementById('productCode').value,
+                profit: parseFloat(document.getElementById('profit').value),
+                status: 'pending',
+                timestamp: Date.now(),
+                workerId: currentWorkerId,
+                workerName: currentWorkerName
+            };
+
+            // Push new order to Firebase
+            database.ref('orders').push(newOrder)
+                .then(() => {
+                    modal.style.display = 'none';
+                    orderForm.reset();
+                    showNotification('Order added successfully!', 'success');
+                })
+                .catch(error => {
+                    showNotification('Error adding order: ' + error.message, 'error');
+                });
+        });
+        }
+
+        // Update Orders Table: Active = pending + delivered, History = completed + cancelled
+        function updateOrdersTable(orders) {
+            if (!currentWorkerId) return;
+            ordersTableBody.innerHTML = '';
+            const orderHistoryTableBody = document.getElementById('orderHistoryTableBody');
+            orderHistoryTableBody.innerHTML = '';
+            Object.entries(orders).forEach(([id, order]) => {
+                if (order.workerId === currentWorkerId) {
+                    if (order.status === 'pending' || order.status === 'delivered') {
+                        // Active Orders: pending or delivered
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${id.slice(-6).toUpperCase()}</td>
+                        <td>${order.customerName}</td>
+                        <td>${order.productCode}</td>
+                        <td>${order.address}</td>
+                        <td>${order.phone}</td>
+                            <td>PKR ${order.profit.toFixed(2)}</td>
+                        <td>
+                            <span class="status-badge status-${order.status}">
+                                ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                            </span>
+                        </td>
+                    `;
+                    ordersTableBody.appendChild(row);
+                    } else if (order.status === 'completed' || order.status === 'cancelled') {
+                        // Order History: completed or cancelled
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${id.slice(-6).toUpperCase()}</td>
+                            <td>${order.customerName}</td>
+                            <td>${order.productCode}</td>
+                            <td>${order.address}</td>
+                            <td>${order.phone}</td>
+                            <td>PKR ${order.profit.toFixed(2)}</td>
+                            <td>
+                                <span class="status-badge status-${order.status}">
+                                    ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                </span>
+                            </td>
+                            <td>${order.completedAt ? new Date(order.completedAt).toLocaleString() : (order.timestamp ? new Date(order.timestamp).toLocaleString() : '')}</td>
+                        `;
+                        orderHistoryTableBody.appendChild(row);
+                    }
+                }
+            });
+        }
+
+        // Update Stats
+        function updateStats(orders) {
+            if (!currentWorkerId) return;
+            console.log('Updating stats with currentWorkerId:', currentWorkerId);
+            const stats = Object.values(orders).reduce((acc, order) => {
+                // Only count orders for current worker
+                if (order.workerId === currentWorkerId) {
+                    acc.total++;
+                    acc[order.status]++;
+                    // Only add profit for completed orders
+                    if (order.status === 'completed') {
+                        acc.totalProfit += order.profit;
+                    }
+                }
+                return acc;
+            }, {
+                total: 0,
+                pending: 0,
+                completed: 0,
+                cancelled: 0,
+                delivered: 0,
+                totalProfit: 0
+            });
+            // Fetch withdrawals and subtract completed withdrawals from totalProfit
+            database.ref('withdrawalRequests').once('value').then(snapshot => {
+                const withdrawals = snapshot.val() || {};
+                const completedWithdrawals = Object.values(withdrawals)
+                    .filter(w => w.workerId === currentWorkerId && w.status === 'completed')
+                    .reduce((total, w) => total + w.amount, 0);
+                console.log('Completed Orders Profit:', stats.totalProfit);
+                console.log('Completed Withdrawals Total:', completedWithdrawals);
+                const netProfit = Math.max(0, stats.totalProfit - completedWithdrawals);
+                console.log('Net Profit (should show on dashboard):', netProfit);
+                totalOrdersEl.textContent = stats.total;
+                pendingOrdersEl.textContent = stats.pending;
+                completedOrdersEl.textContent = stats.completed;
+                cancelledOrdersEl.textContent = stats.cancelled;
+                totalProfitEl.textContent = `PKR ${netProfit.toFixed(2)}`;
+            });
+        }
+
+        // Notification System
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Handle Withdraw Form Submission
+        if (withdrawForm) {
+        withdrawForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            const accountHolder = document.getElementById('accountHolder').value;
+            const accountNumber = document.getElementById('accountNumber').value;
+            try {
+                // Get all withdrawal requests
+                const withdrawalSnapshot = await database.ref('withdrawalRequests').once('value');
+                const withdrawals = withdrawalSnapshot.val() || {};
+                // Calculate total profit from completed orders only
+                const workerOrders = Object.values(orders || {})
+                    .filter(order => order.workerId === currentWorkerId && order.status === 'completed');
+                console.log('Worker Orders:', workerOrders);
+                const totalProfit = workerOrders
+                    .reduce((total, order) => total + order.profit, 0);
+                console.log('Total Profit:', totalProfit);
+                // Calculate total completed withdrawals
+                const workerWithdrawals = Object.values(withdrawals)
+                    .filter(w => w.workerId === currentWorkerId && w.status === 'completed');
+                console.log('Completed Withdrawals:', workerWithdrawals);
+                const completedWithdrawals = workerWithdrawals
+                    .reduce((total, w) => total + w.amount, 0);
+                console.log('Total Completed Withdrawals:', completedWithdrawals);
+                // Calculate actual available balance
+                const actualBalance = totalProfit - completedWithdrawals;
+                console.log('Available Balance:', actualBalance);
+                console.log('Requested Withdrawal Amount:', amount);
+                // Validate withdrawal amount
+                if (amount < 200 || amount > 50000) {
+                        showNotification('Withdrawal amount must be between PKR 200 and PKR 50,000', 'error');
+                    return;
+                }
+                if (amount > actualBalance) {
+                        showNotification(`Insufficient balance. Available: PKR ${actualBalance}, Requested: PKR ${amount}`, 'error');
+                    return;
+                }
+                // Create withdrawal request
+                const withdrawalRequest = {
+                    workerId: currentWorkerId,
+                    workerName: currentWorkerName,
+                    amount: amount,
+                    paymentMethod: paymentMethod,
+                    accountHolder: accountHolder,
+                    accountNumber: accountNumber,
+                    status: 'pending',
+                    timestamp: Date.now()
+                };
+                // Push withdrawal request to Firebase
+                await database.ref('withdrawalRequests').push(withdrawalRequest);
+                withdrawModal.style.display = 'none';
+                withdrawForm.reset();
+                showNotification('Withdrawal request submitted successfully!', 'success');
+            } catch (error) {
+                console.error('Error in withdrawal submission:', error);
+                showNotification('Error submitting withdrawal request: ' + error.message, 'error');
+            }
+        });
+        }
+
+        // Handle Profile Form Submission
+        if (profileForm) {
+            profileForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const newName = profileNameInput.value;
+                const newEmail = profileEmailInput.value; // Email is read-only
+                const errorMessage = profileErrorMessage;
+                const successMessage = profileSuccessMessage;
+                errorMessage.style.display = 'none';
+                successMessage.style.display = 'none';
+
+                if (!newName) {
+                    errorMessage.textContent = 'Name cannot be empty.';
+                    errorMessage.style.display = 'block';
+                    return;
+                }
+
+                try {
+                    await database.ref(`workers/${currentWorkerId}`).update({ name: newName });
+                    currentWorkerName = newName;
+                    document.getElementById('workerName').textContent = currentWorkerName;
+                    successMessage.textContent = 'Profile updated successfully!';
+                    successMessage.style.display = 'block';
+                } catch (error) {
+                    errorMessage.textContent = 'Error updating profile: ' + error.message;
+                    errorMessage.style.display = 'block';
+                    console.error('Error updating profile:', error);
+                }
+            });
+        }
+
+        // Add logic for order history tab
+        const showOrderHistoryBtn = document.getElementById('showOrderHistoryBtn');
+        const backToActiveOrdersBtn = document.getElementById('backToActiveOrdersBtn');
+        const activeOrdersTableSection = document.getElementById('activeOrdersTableSection');
+        const orderHistoryTableSection = document.getElementById('orderHistoryTableSection');
+        const orderHistoryTableBody = document.getElementById('orderHistoryTableBody');
+
+        if (showOrderHistoryBtn && backToActiveOrdersBtn && activeOrdersTableSection && orderHistoryTableSection) {
+            showOrderHistoryBtn.addEventListener('click', () => {
+                activeOrdersTableSection.style.display = 'none';
+                orderHistoryTableSection.style.display = 'block';
+                showOrderHistoryBtn.style.display = 'none';
+                backToActiveOrdersBtn.style.display = 'inline-block';
+            });
+            backToActiveOrdersBtn.addEventListener('click', () => {
+                activeOrdersTableSection.style.display = 'block';
+                orderHistoryTableSection.style.display = 'none';
+                showOrderHistoryBtn.style.display = 'inline-block';
+                backToActiveOrdersBtn.style.display = 'none';
+            });
+        }
+
+        // Orders section tab logic
+        const activeOrdersTab = document.getElementById('activeOrdersTab');
+        const orderHistoryTab = document.getElementById('orderHistoryTab');
+        if (activeOrdersTab && orderHistoryTab && activeOrdersTableSection && orderHistoryTableSection) {
+            activeOrdersTab.addEventListener('click', () => {
+                activeOrdersTab.classList.add('btn-secondary-active');
+                orderHistoryTab.classList.remove('btn-secondary-active');
+                activeOrdersTableSection.style.display = 'block';
+                orderHistoryTableSection.style.display = 'none';
+            });
+            orderHistoryTab.addEventListener('click', () => {
+                orderHistoryTab.classList.add('btn-secondary-active');
+                activeOrdersTab.classList.remove('btn-secondary-active');
+                activeOrdersTableSection.style.display = 'none';
+                orderHistoryTableSection.style.display = 'block';
+            });
+        }
+
+        // Real-time unread notification count badge
+        function updateNotificationBadgeRealtime() {
+            if (!currentWorkerId) return;
+            const badge = document.getElementById('notificationBadge');
+            database.ref(`notifications/${currentWorkerId}`).on('value', (snapshot) => {
+                let unreadCount = 0;
+                snapshot.forEach((notifSnapshot) => {
+                    const notification = notifSnapshot.val();
+                    if (!notification.read) unreadCount++;
+                });
+                if (badge) {
+                    if (unreadCount > 0) {
+                        badge.textContent = unreadCount;
+                        badge.style.display = 'inline-block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html> 
